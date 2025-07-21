@@ -2,77 +2,87 @@ import React, { useRef, useState } from "react";
 
 const Canvas = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [isDrawing, setIsDrawing] = useState(false);
-  const [brushColor, setBrushColor] = useState("#000000");
-  const [brushSize, setBrushSize] = useState(5);
-  const [prevPos, setPrevPos] = useState<{ x: number; y: number } | null>(null);
+  const [color, setColor] = useState("#000");
+  const [size, setSize] = useState(5);
+  const [drawing, setDrawing] = useState(false);
+  const [lastPos, setLastPos] = useState<{ x: number; y: number } | null>(null);
 
-  const getPosition = (e: React.MouseEvent<HTMLCanvasElement>) => {
+  const getPos = (e: React.MouseEvent<HTMLCanvasElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
     return { x: e.clientX - rect.left, y: e.clientY - rect.top };
   };
 
-  const handleMouseDown = (e: React.MouseEvent<HTMLCanvasElement>) => {
-    setIsDrawing(true);
-    setPrevPos(getPosition(e));
+  const start = (e: React.MouseEvent<HTMLCanvasElement>) => {
+    setDrawing(true);
+    setLastPos(getPos(e));
   };
 
-  const handleMouseMove = (e: React.MouseEvent<HTMLCanvasElement>) => {
-    if (!isDrawing || !prevPos || !canvasRef.current) return;
+  const move = (e: React.MouseEvent<HTMLCanvasElement>) => {
+    if (!drawing || !lastPos || !canvasRef.current) return;
     const ctx = canvasRef.current.getContext("2d");
     if (!ctx) return;
-    const currentPos = getPosition(e);
-    ctx.strokeStyle = brushColor;
-    ctx.lineWidth = brushSize;
+    const currentPos = getPos(e);
+    ctx.strokeStyle = color;
+    ctx.lineWidth = size;
     ctx.lineCap = "round";
     ctx.beginPath();
-    ctx.moveTo(prevPos.x, prevPos.y);
+    ctx.moveTo(lastPos.x, lastPos.y);
     ctx.lineTo(currentPos.x, currentPos.y);
     ctx.stroke();
-    setPrevPos(currentPos);
+    setLastPos(currentPos);
   };
 
-  const handleMouseUp = () => {
-    setIsDrawing(false);
-    setPrevPos(null);
+  const stop = () => {
+    setDrawing(false);
+    setLastPos(null);
   };
 
-  const clearCanvas = () => {
+  const clear = () => {
+    canvasRef.current?.getContext("2d")?.clearRect(0, 0, 1000, 600);
+  };
+
+  const save = () => {
     const canvas = canvasRef.current;
     if (canvas) {
-      const ctx = canvas.getContext("2d");
-      if (ctx) ctx.clearRect(0, 0, canvas.width, canvas.height);
+      const link = document.createElement("a");
+      link.href = canvas.toDataURL("image/png");
+      link.download = "my-drawing.png";
+      link.click();
     }
   };
 
+  const shareToLine = () => {
+    const url = encodeURIComponent("https://你的畫布網站.vercel.app");
+    window.open(`https://social-plugins.line.me/lineit/share?url=${url}`, "_blank");
+  };
+
   return (
-    <div style={{ marginTop: "20px" }}>
-      <div style={{ marginBottom: "12px" }}>
-        <input type="color" value={brushColor} onChange={(e) => setBrushColor(e.target.value)} />
-        <input
-          type="range"
-          min="1"
-          max="50"
-          value={brushSize}
-          onChange={(e) => setBrushSize(parseInt(e.target.value))}
-        />
-        <span>{brushSize}px</span>
-        <button onClick={clearCanvas} style={{ marginLeft: "12px" }}>清除畫布</button>
+    <div style={{ position: "relative", marginTop: "30px", width: "1000px", margin: "auto" }}>
+      {/* 咒語四周環繞 */}
+      <div style={{ position: "absolute", top: "-35px", left: "50%", transform: "translateX(-50%)", fontWeight: "bold" }}>ॐ मणि पद्मे हूं</div>
+      <div style={{ position: "absolute", bottom: "-35px", left: "50%", transform: "translateX(-50%)", fontWeight: "bold" }}>ॐ मणि पद्मे हूं</div>
+      <div style={{ position: "absolute", top: "50%", left: "-140px", transform: "translateY(-50%) rotate(-90deg)", fontWeight: "bold" }}>ॐ मणि पद्मे हूं</div>
+      <div style={{ position: "absolute", top: "50%", right: "-140px", transform: "translateY(-50%) rotate(90deg)", fontWeight: "bold" }}>ॐ मणि पद्मे हूं</div>
+
+      {/* 工具列 */}
+      <div style={{ marginBottom: "10px" }}>
+        <input type="color" value={color} onChange={(e) => setColor(e.target.value)} />
+        <input type="range" min="1" max="50" value={size} onChange={(e) => setSize(parseInt(e.target.value))} />
+        <span>{size}px</span>
+        <button onClick={clear} style={{ marginLeft: "10px" }}>清除</button>
+        <button onClick={save} style={{ marginLeft: "10px" }}>儲存</button>
+        <button onClick={shareToLine} style={{ marginLeft: "10px" }}>分享到 LINE</button>
       </div>
+
+      {/* 畫布 */}
       <canvas
         ref={canvasRef}
-        width={600}
-        height={400}
-        onMouseDown={handleMouseDown}
-        onMouseMove={handleMouseMove}
-        onMouseUp={handleMouseUp}
-        style={{
-          border: "2px solid #333",
-          borderRadius: "12px",
-          backgroundColor: "#fff",
-          display: "block",
-          margin: "0 auto"
-        }}
+        width={1000}
+        height={600}
+        style={{ border: "2px solid #333", backgroundColor: "#fff", borderRadius: "12px" }}
+        onMouseDown={start}
+        onMouseMove={move}
+        onMouseUp={stop}
       />
     </div>
   );
