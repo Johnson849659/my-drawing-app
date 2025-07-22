@@ -9,7 +9,7 @@ const Canvas = () => {
   const [drawing, setDrawing] = useState(false);
   const [lastPos, setLastPos] = useState<{ x: number; y: number } | null>(null);
 
-  const websiteURL = "https://my-drawing-app-git-main-johns-projects-dd99a6d8.vercel.app/"; // ✅ 你部署後的正式網址！
+  const websiteURL = "https://my-drawing-app-git-main-johns-projects-dd99a6d8.vercel.app/";
 
   useEffect(() => {
     localStorage.setItem("myNote", note);
@@ -73,15 +73,15 @@ const Canvas = () => {
       style={{
         maxWidth: "1000px",
         margin: "auto",
-        textAlign: "center",
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
+        textAlign: "center",
         position: "relative",
         paddingBottom: "80px",
       }}
     >
-      {/* 🧘 咒語環繞（上下 + 左右 x3） */}
+      {/* 🧘 咒語環繞 */}
       {["top", "bottom"].map((pos) =>
         [0, 1, 2].map((i) => (
           <div
@@ -117,7 +117,7 @@ const Canvas = () => {
         ))
       )}
 
-      {/* 🎛️ 工具列 */}
+      {/* 工具列 */}
       <div style={{ marginBottom: "12px" }}>
         <input type="color" value={color} onChange={(e) => setColor(e.target.value)} />
         <input type="range" min="1" max="50" value={size} onChange={(e) => setSize(parseInt(e.target.value))} />
@@ -134,7 +134,13 @@ const Canvas = () => {
         ref={canvasRef}
         width={1000}
         height={600}
-        style={{ display: "block", margin: "auto", border: "2px solid #333", backgroundColor: "#fff", borderRadius: "12px" }}
+        style={{
+          display: "block",
+          alignSelf: "center",
+          border: "2px solid #333",
+          backgroundColor: "#fff",
+          borderRadius: "12px",
+        }}
         onMouseDown={startDraw}
         onMouseMove={draw}
         onMouseUp={stopDraw}
@@ -153,12 +159,13 @@ const Canvas = () => {
         />
       </div>
 
-     
+      
     </div>
   );
 };
 
 export default Canvas;
+
 
 
 
