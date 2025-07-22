@@ -9,7 +9,7 @@ const Canvas = () => {
   const [drawing, setDrawing] = useState(false);
   const [lastPos, setLastPos] = useState<{ x: number; y: number } | null>(null);
 
-  const websiteURL = "https://你的-vercel-網址.vercel.app"; // ←改成你自己的網址！
+  const websiteURL = "https://my-drawing-app-git-main-johns-projects-dd99a6d8.vercel.app/"; // ← 改成你自己的部署網址！
 
   useEffect(() => {
     localStorage.setItem("myNote", note);
@@ -59,17 +59,22 @@ const Canvas = () => {
     }
   };
 
-  const shareImageToLINE = () => {
+  // ✅ LINE 分享（方式二：使用 LINE App 分享 base64 圖片）
+  const shareImageToLINE = async () => {
     const canvas = canvasRef.current;
     if (!canvas) return;
+
     const imageData = canvas.toDataURL("image/png");
-    const encodedImage = encodeURIComponent(imageData);
-    window.open(`https://social-plugins.line.me/lineit/share?url=${encodedImage}`, "_blank");
+    const blob = await (await fetch(imageData)).blob();
+    const fileURL = URL.createObjectURL(blob);
+
+    // LINE URI Scheme (僅支援手機，桌機無效)
+    window.open(`line://msg/image/${fileURL}`, "_blank");
   };
 
   return (
     <div style={{ maxWidth: "1000px", margin: "auto", textAlign: "center", position: "relative", paddingBottom: "80px" }}>
-      {/* 🧘 咒語四周環繞更多 */}
+      {/* 🧘 咒語環繞更多組 */}
       {["top", "bottom"].map((pos) =>
         [0, 1, 2].map((i) => (
           <div
@@ -103,7 +108,7 @@ const Canvas = () => {
         ))
       )}
 
-      {/* 🎛️ 工具列 */}
+      {/* 工具列 */}
       <div style={{ marginBottom: "12px" }}>
         <input type="color" value={color} onChange={(e) => setColor(e.target.value)} />
         <input type="range" min="1" max="50" value={size} onChange={(e) => setSize(parseInt(e.target.value))} />
@@ -111,11 +116,11 @@ const Canvas = () => {
         <button onClick={clearCanvas} style={{ marginLeft: "10px" }}>清除</button>
         <button onClick={saveImage} style={{ marginLeft: "10px" }}>儲存圖片</button>
         <button onClick={shareImageToLINE} style={{ marginLeft: "10px", backgroundColor: "#00c300", color: "#fff", padding: "6px 12px", borderRadius: "6px" }}>
-          分享圖片到 LINE
+          分享圖片到 LINE App
         </button>
       </div>
 
-      {/* 🎨 畫布 */}
+      {/* 畫布 */}
       <canvas
         ref={canvasRef}
         width={1000}
@@ -126,7 +131,7 @@ const Canvas = () => {
         onMouseUp={stopDraw}
       />
 
-      {/* 📝 筆記區 */}
+      {/* 筆記 */}
       <div style={{ marginTop: "30px" }}>
         <h3>📝 創作筆記</h3>
         <textarea
@@ -139,10 +144,11 @@ const Canvas = () => {
         />
       </div>
 
-     
+      
     </div>
   );
 };
 
 export default Canvas;
+
 
