@@ -9,7 +9,7 @@ const Canvas = () => {
   const [drawing, setDrawing] = useState(false);
   const [lastPos, setLastPos] = useState<{ x: number; y: number } | null>(null);
 
-  const websiteURL = "https://my-drawing-app-git-main-johns-projects-dd99a6d8.vercel.app/"; // ← 改成你自己的部署網址！
+  const websiteURL = "https://my-drawing-app-git-main-johns-projects-dd99a6d8.vercel.app/"; // ✅ 你部署後的正式網址！
 
   useEffect(() => {
     localStorage.setItem("myNote", note);
@@ -59,22 +59,29 @@ const Canvas = () => {
     }
   };
 
-  // ✅ LINE 分享（方式二：使用 LINE App 分享 base64 圖片）
   const shareImageToLINE = async () => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-
     const imageData = canvas.toDataURL("image/png");
     const blob = await (await fetch(imageData)).blob();
     const fileURL = URL.createObjectURL(blob);
-
-    // LINE URI Scheme (僅支援手機，桌機無效)
     window.open(`line://msg/image/${fileURL}`, "_blank");
   };
 
   return (
-    <div style={{ maxWidth: "1000px", margin: "auto", textAlign: "center", position: "relative", paddingBottom: "80px" }}>
-      {/* 🧘 咒語環繞更多組 */}
+    <div
+      style={{
+        maxWidth: "1000px",
+        margin: "auto",
+        textAlign: "center",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        position: "relative",
+        paddingBottom: "80px",
+      }}
+    >
+      {/* 🧘 咒語環繞（上下 + 左右 x3） */}
       {["top", "bottom"].map((pos) =>
         [0, 1, 2].map((i) => (
           <div
@@ -84,7 +91,8 @@ const Canvas = () => {
               [pos]: "-30px",
               left: `${25 + i * 25}%`,
               transform: "translateX(-50%)",
-              fontWeight: "bold"
+              fontWeight: "bold",
+              fontSize: "18px",
             }}
           >
             ॐ मणि पद्मे हूं
@@ -100,7 +108,8 @@ const Canvas = () => {
               top: `${25 + i * 25}%`,
               [side]: "-140px",
               transform: `translateY(-50%) rotate(${side === "left" ? -90 : 90}deg)`,
-              fontWeight: "bold"
+              fontWeight: "bold",
+              fontSize: "18px",
             }}
           >
             ॐ मणि पद्मे हूं
@@ -108,7 +117,7 @@ const Canvas = () => {
         ))
       )}
 
-      {/* 工具列 */}
+      {/* 🎛️ 工具列 */}
       <div style={{ marginBottom: "12px" }}>
         <input type="color" value={color} onChange={(e) => setColor(e.target.value)} />
         <input type="range" min="1" max="50" value={size} onChange={(e) => setSize(parseInt(e.target.value))} />
@@ -120,19 +129,19 @@ const Canvas = () => {
         </button>
       </div>
 
-      {/* 畫布 */}
+      {/* 🎨 畫布 */}
       <canvas
         ref={canvasRef}
         width={1000}
         height={600}
-        style={{ border: "2px solid #333", backgroundColor: "#fff", borderRadius: "12px" }}
+        style={{ display: "block", margin: "auto", border: "2px solid #333", backgroundColor: "#fff", borderRadius: "12px" }}
         onMouseDown={startDraw}
         onMouseMove={draw}
         onMouseUp={stopDraw}
       />
 
-      {/* 筆記 */}
-      <div style={{ marginTop: "30px" }}>
+      {/* 📝 筆記 */}
+      <div style={{ marginTop: "30px", width: "100%" }}>
         <h3>📝 創作筆記</h3>
         <textarea
           rows={4}
@@ -144,11 +153,12 @@ const Canvas = () => {
         />
       </div>
 
-      
+     
     </div>
   );
 };
 
 export default Canvas;
+
 
 
